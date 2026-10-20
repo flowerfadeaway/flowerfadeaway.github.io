@@ -39,6 +39,9 @@
   .btn-primary { background: #0a84ff; color: #fff; }
   .btn-secondary { background: #eef0f3; color: #1c1c1e; }
   .copied { color: #34c759 !important; }
+  .fail { color: #c93400 !important; }
+  /* 10.20 晚:微信 webview 剪贴板写可能被静默拒——失败降级为长按拷贝,码元素整选 */
+  .code { -webkit-user-select: all; user-select: all; }
   footer { margin-top: auto; padding-top: 40px; font-size: 12px; color: #a1a1a6; }
   footer a { color: #a1a1a6; }
 </style>
@@ -62,7 +65,7 @@
   <footer><a href="https://flowerfadeaway.github.io/anti-addiction-pages/">隐私政策</a></footer>
 <script>
 (function () {
-  var isWeChat = /MicroMessenger/i.test(navigator.userAgent);
+  var isWeChat = /MicroMessenger|WeChat|wxwork/i.test(navigator.userAgent);
   if (isWeChat) document.getElementById('wxTip').style.display = 'block';
 
   var m = location.search.match(/[?&]code=(\d{6})/);
@@ -84,16 +87,33 @@
       btn.textContent = '已复制 ✓ 装好后打开 App 即自动确认';
       btn.classList.add('copied');
     };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(done, function () { fallback(text); done(); });
-    } else { fallback(text); done(); }
+    copyText(text).then(function (ok) {
+      if (ok) { done(); return; }
+      // 10.20 晚修「假已复制」:微信 webview 常拒写剪贴板——如实降级为长按拷贝(上方码已 user-select:all)
+      btn.textContent = '复制没成功——长按上方邀请码,全选后拷贝';
+      btn.classList.add('fail');
+    });
   });
-  function fallback(text) {
+  function copyText(text) {
+    return new Promise(function (resolve) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { resolve(true); },
+                                                 function () { resolve(legacyCopy(text)); });
+      } else { resolve(legacyCopy(text)); }
+    });
+  }
+  // execCommand 需要「选区」;focus+select+setSelectionRange 后在用户手势上下文里 WKWebView 可成。
+  // 返回布尔,不再吞掉失败(execCommand 返回 false = 没写进去)。
+  function legacyCopy(text) {
     var ta = document.createElement('textarea');
-    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select();
-    try { document.execCommand('copy'); } catch (e) {}
+    ta.value = text; ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select(); ta.setSelectionRange(0, text.length);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
     document.body.removeChild(ta);
+    return ok;
   }
 })();
 </script>
