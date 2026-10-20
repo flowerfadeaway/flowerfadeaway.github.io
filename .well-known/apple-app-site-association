@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["77WY564TXS.com.liujunxuan.antiaddiction"],
+        "components": [
+          { "/": "/join", "comment": "邀请接受页:antiaddiction onOpenURL 提取 code" },
+          { "/": "/join/" }
+        ],
+        "paths": ["/join", "/join/*"]
+      }
+    ]
+  }
+}

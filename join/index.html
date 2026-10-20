@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>锁钥相宜 · 把关邀请</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+    background: #f6f7f9; color: #1c1c1e;
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    padding: max(24px, env(safe-area-inset-top)) 20px max(32px, env(safe-area-inset-bottom));
+  }
+  .wx-tip {
+    display: none; width: 100%; max-width: 420px;
+    background: #fff7e6; color: #8a5a00; border-radius: 12px;
+    font-size: 13px; line-height: 1.6; padding: 10px 14px; margin-bottom: 16px;
+  }
+  .card {
+    width: 100%; max-width: 420px; background: #fff; border-radius: 20px;
+    padding: 36px 24px 28px; text-align: center;
+    box-shadow: 0 6px 30px rgba(0,0,0,.06); margin-top: 12vh;
+  }
+  .icon { font-size: 52px; }
+  h1 { font-size: 21px; margin: 14px 0 8px; }
+  p.desc { font-size: 14px; color: #6e6e73; line-height: 1.7; }
+  .code-box {
+    margin: 22px auto 6px; padding: 14px 0;
+    background: #f2f3f5; border-radius: 14px;
+  }
+  .code-label { font-size: 12px; color: #86868b; letter-spacing: 2px; }
+  .code { font-size: 34px; font-weight: 700; letter-spacing: 8px; font-variant-numeric: tabular-nums; }
+  .btn {
+    display: block; width: 100%; padding: 15px 0; margin-top: 14px;
+    border: 0; border-radius: 14px; font-size: 16px; font-weight: 600;
+    text-decoration: none; cursor: pointer;
+  }
+  .btn-primary { background: #0a84ff; color: #fff; }
+  .btn-secondary { background: #eef0f3; color: #1c1c1e; }
+  .copied { color: #34c759 !important; }
+  footer { margin-top: auto; padding-top: 40px; font-size: 12px; color: #a1a1a6; }
+  footer a { color: #a1a1a6; }
+</style>
+</head>
+<body>
+  <div class="wx-tip" id="wxTip">
+    微信内使用:已安装「锁钥相宜」?点右上角「···」选择<b>「在浏览器打开」</b>,可直接进入邀请确认页。
+  </div>
+  <div class="card">
+    <div class="icon">🔒</div>
+    <h1 id="title">你收到一条把关邀请</h1>
+    <p class="desc" id="desc">好友邀请你在 TA 想刷短视频管不住自己时提醒把关。TA 被拦时会来问你的看法,决定权始终在 TA 自己。</p>
+    <div class="code-box" id="codeBox">
+      <div class="code-label">邀 请 码</div>
+      <div class="code" id="code">------</div>
+    </div>
+    <a class="btn btn-primary" href="https://apps.apple.com/cn/app/id6813038440" id="dl">下载「锁钥相宜」</a>
+    <button class="btn btn-secondary" id="copy" style="display:none">复制邀请信息</button>
+    <p class="desc" id="copyHint" style="margin-top:12px; display:none">装好 App 后直接打开,会自动弹出接受确认。</p>
+  </div>
+  <footer><a href="https://flowerfadeaway.github.io/anti-addiction-pages/">隐私政策</a></footer>
+<script>
+(function () {
+  var isWeChat = /MicroMessenger/i.test(navigator.userAgent);
+  if (isWeChat) document.getElementById('wxTip').style.display = 'block';
+
+  var m = location.search.match(/[?&]code=(\d{6})/);
+  var code = m ? m[1] : null;
+  if (!code) {
+    document.getElementById('title').textContent = '锁钥相宜';
+    document.getElementById('desc').textContent = '想刷短视频时先停一停:上锁、深呼吸、找把关好友。和信任的人一起,把注意力拿回来。';
+    document.getElementById('codeBox').style.display = 'none';
+    return;
+  }
+  document.getElementById('code').textContent = code;
+  var btn = document.getElementById('copy');
+  btn.style.display = 'block';
+  document.getElementById('copyHint').style.display = 'block';
+  btn.addEventListener('click', function () {
+    // 与 App 端剪贴板识别正则(邀请码[:：]?\s*\d{6})逐字兼容;装完首开自动弹确认
+    var text = '我给自己上了锁,请你当我的把关好友 🔒\n邀请码:' + code + '\n装好「锁钥相宜」后直接打开 App,会自动弹出接受把关的确认(24 小时内有效)';
+    var done = function () {
+      btn.textContent = '已复制 ✓ 装好后打开 App 即自动确认';
+      btn.classList.add('copied');
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallback(text); done(); });
+    } else { fallback(text); done(); }
+  });
+  function fallback(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+})();
+</script>
+</body>
+</html>
