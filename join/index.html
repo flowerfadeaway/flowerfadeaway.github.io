@@ -62,7 +62,7 @@
     <button class="btn btn-secondary" id="copy" style="display:none">复制邀请信息</button>
     <p class="desc" id="copyHint" style="margin-top:12px; display:none">装好 App 后直接打开,会自动弹出接受确认。</p>
   </div>
-  <footer><a href="https://flowerfadeaway.github.io/anti-addiction-pages/">隐私政策</a></footer>
+  <footer><a href="https://flowerfadeaway.github.io/anti-addiction-pages/">隐私政策</a><span> · 锁钥相宜 · 锁住时间，赢得人生</span></footer>
 <script>
 (function () {
   var isWeChat = /MicroMessenger|WeChat|wxwork/i.test(navigator.userAgent);
@@ -72,7 +72,7 @@
   var code = m ? m[1] : null;
   if (!code) {
     document.getElementById('title').textContent = '锁钥相宜';
-    document.getElementById('desc').textContent = '想刷短视频时先停一停:上锁、深呼吸、找把关好友。和信任的人一起,把注意力拿回来。';
+    document.getElementById('desc').textContent = '锁住时间,赢得人生。想刷短视频时先停一停:上锁、深呼吸、找把关好友。和信任的人一起,把注意力拿回来。';
     document.getElementById('codeBox').style.display = 'none';
     return;
   }
